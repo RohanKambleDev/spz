@@ -1,4 +1,3 @@
-
 var imgSrc, profileId, albumUrl, albumPageDiv, filterImgSrc, imgPreview = '';
 var imagesArr, albumUrlStack = [];
 var cachedImagesSrcList = [];
@@ -16,6 +15,42 @@ var defaults = {
             "text-align"         : "center"
         },
     };
+
+shaadiPhotoZoom = function(){        
+
+    albumPageDiv = jQuery("<div class='albumPageDiv'></div>").hide();
+    imgPreview   = jQuery("<div class='imgPreview'></div>");
+
+    if(jQuery("body .albumPageDiv").length == 0){
+        jQuery("body").append(albumPageDiv);
+    }
+
+    if(jQuery("body .imgPreview").length == 0){
+        jQuery("body").prepend(imgPreview);
+    }
+
+    jQuery("img").on( "mousemove", function( event ) {
+
+        imgSrc    = jQuery(this).attr('src');
+        profileId = (imgSrc.substring(imgSrc.lastIndexOf('-'), -1)).substring(imgSrc.lastIndexOf('/')).substring(1);
+        albumUrl  = window.location.origin+'/profile/index/view-album-photos/profileid/'+profileId;
+
+        // load external album url
+        jQuery("body .albumPageDiv").load(albumUrl);
+        
+        imagesArr = jQuery("body .albumPageDiv").find('div#photo-gallery img').clone();
+               
+        jQuery("body .imgPreview").html(imagesArr[1]);
+        jQuery("body .imgPreview").css(defaults.zoomStyle);
+
+        // calculate x y position with precision
+        whenMouseMove(jQuery("body .imgPreview"), event);
+        
+    }).on('mouseout', function(event){
+        // on mouse out of img tag make image preview blank
+        jQuery("body .imgPreview").html('');
+    });
+}
 
 function whenMouseMove(imgObj, e){
     var w  = 0, x = 0;
@@ -75,42 +110,6 @@ function getYPosition(imgObj){
         pos =  jQuery(window).scrollTop();
     }
     return (imgObj.topPos > imgObj.height() ? (imgObj.y-5) : pos );    
-}
-
-shaadiPhotoZoom = function(){        
-
-    albumPageDiv = jQuery("<div class='albumPageDiv'></div>").hide();
-    imgPreview   = jQuery("<div class='imgPreview'></div>");
-
-    if(jQuery("body .albumPageDiv").length == 0){
-        jQuery("body").append(albumPageDiv);
-    }
-
-    if(jQuery("body .imgPreview").length == 0){
-        jQuery("body").prepend(imgPreview);
-    }
-
-    jQuery("img").on( "mousemove", function( event ) {
-
-        imgSrc    = jQuery(this).attr('src');
-        profileId = (imgSrc.substring(imgSrc.lastIndexOf('-'), -1)).substring(imgSrc.lastIndexOf('/')).substring(1);
-        albumUrl  = window.location.origin+'/profile/index/view-album-photos/profileid/'+profileId;
-
-        // load external album url
-        jQuery("body .albumPageDiv").load(albumUrl);
-        
-        imagesArr = jQuery("body .albumPageDiv").find('div#photo-gallery img').clone();
-               
-        jQuery("body .imgPreview").html(imagesArr[1]);
-        jQuery("body .imgPreview").css(defaults.zoomStyle);
-
-        // calculate x y position with precision
-        whenMouseMove(jQuery("body .imgPreview"), event);
-        
-    }).on('mouseout', function(event){
-        // on mouse out of img tag make image preview blank
-        jQuery("body .imgPreview").html('');
-    });
 }
 
 jQuery(document).bind('DOMSubtreeModified', function() {
